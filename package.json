@@ -1,0 +1,7 @@
+{
+  "name": "gestures",
+  "version": "0.1.0",
+  "main": "lib/gestures.js",
+  "author": "Jason Nelson",
+  "license": "MIT"
+}
