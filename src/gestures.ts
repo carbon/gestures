@@ -23,7 +23,6 @@ module Carbon {
 
     let supportsTouchAction = 'touchAction' in testElement.style;
     
-    let TOUCH_ACTION_AUTO = 'auto';
     let TOUCH_ACTION_MAP = getTouchActionProps();
     
     let MOBILE_REGEX = /mobile|tablet|ip(ad|hone|od)|android/i;
@@ -39,7 +38,7 @@ module Carbon {
     let INPUT_END = 4;
     let INPUT_CANCEL = 8;
     
-    enum Direction {
+    export enum Direction {
       None = 1,
       Left = 2,
       Right = 4,
@@ -50,7 +49,6 @@ module Carbon {
       All = Horizontal | Vertical
     };
     
-    let PROPS_XY = [ 'x', 'y' ];
     let PROPS_CLIENT_XY = ['clientX', 'clientY'];
     
     enum State {
@@ -209,11 +207,8 @@ module Carbon {
      * @returns {Recognizer}
      */
     function getRecognizerByNameIfManager(otherRecognizer: Recognizer | string, recognizer: Recognizer) {
-
-      console.log(otherRecognizer);
-
       if (recognizer.manager) {
-        return  recognizer.manager.get(otherRecognizer);
+        return recognizer.manager.get(otherRecognizer);
       }
 
       return otherRecognizer;
@@ -225,11 +220,14 @@ module Carbon {
     function stateStr(state: State) : string {
       if (state & State.Canceled) {
         return 'cancel';
-      } else if (state & State.Ended) {
+      } 
+      else if (state & State.Ended) {
         return 'end';
-      } else if (state & State.Changed) {
+      } 
+      else if (state & State.Changed) {
         return 'move';
-      } else if (state & State.Began) {
+      } 
+      else if (state & State.Began) {
         return 'start';
       }
       return '';
@@ -769,7 +767,7 @@ module Carbon {
      */
     function getDistance(p1: Point, p2: Point, props?): number {
       if (!props) {
-        props = PROPS_XY;
+        props = [ 'x', 'y' ];
       }
       var x = p2[props[0]] - p1[props[0]];
       var y = p2[props[1]] - p1[props[1]];
@@ -911,7 +909,7 @@ module Carbon {
       }
 
       getTouchAction() {
-        return [TOUCH_ACTION_AUTO];
+        return [ 'auto' ];
       }
     
       process(input): State {
@@ -991,7 +989,7 @@ module Carbon {
         return 'manipulation';
       }
     
-      return TOUCH_ACTION_AUTO;
+      return 'auto';
     }
     
     /**
@@ -1171,7 +1169,7 @@ module Carbon {
      */
     function getAngle(p1: any, p2: any, props?) {
       if (!props) {
-        props = PROPS_XY;
+        props = [ 'x', 'y' ];
       }
       var x = p2[props[0]] - p1[props[0]];
       var y = p2[props[1]] - p1[props[1]];
@@ -1429,7 +1427,6 @@ module Carbon {
         // smaller wrapper around the handler, for the scope and the enabled state of the manager,
         // so when disabled the input events are completely bypassed.
         this.domHandler = ev => {
-          
           if (boolOrFn(manager.options.enable, [manager])) {
             this.handler(ev);
           }
@@ -1576,13 +1573,12 @@ module Carbon {
      * Multi-user touch events input
      */
     class TouchInput extends Input {
-      targetIds: any;
+      targetIds: { };
 
       constructor(manager, callback) {
         super(manager, callback);
       
         this.evTarget = TOUCH_TARGET_EVENTS;
-        this.targetIds = {};
         this.evTarget = TOUCH_TARGET_EVENTS;
 
         this.init();
@@ -1670,16 +1666,14 @@ module Carbon {
      * Mouse events input
      */
     class MouseInput extends Input {
-      pressed: boolean;
+      pressed = false; // mousedown state
 
       constructor(manager, callback) {
         super(manager, callback);
         
         this.evEl = 'mousedown';
         this.evWin = 'mousemove mouseup';
-    
-        this.pressed = false; // mousedown state
-        
+            
         this.init();
       }
 
@@ -1898,7 +1892,6 @@ module Carbon {
       constructor(element: HTMLElement, options?: Options) {
         this.options = mergeOptions(options, defaults);
 
-
         this.options.inputTarget = this.options.inputTarget || element;
     
         this.element = element;
@@ -2080,8 +2073,8 @@ module Carbon {
        * @returns {EventEmitter} this
        */
     
-      on(events: string, handler: Function) {
-        if (events === undefined) {
+      on(eventTypes: string, handler: Function) {
+        if (eventTypes === undefined) {
           return;
         }
         if (handler === undefined) {
@@ -2090,9 +2083,9 @@ module Carbon {
 
         var handlers = this.handlers;
 
-        for (var event of splitStr(events)) {
-          handlers[event] = handlers[event] || [];
-          handlers[event].push(handler);
+        for (var type of splitStr(eventTypes)) {
+          handlers[type] = handlers[type] || [ ];
+          handlers[type].push(handler);
         }
         
         return this;
@@ -2102,18 +2095,18 @@ module Carbon {
        * unbind event, leave emit blank to remove all handlers
        * @returns {EventEmitter} this
        */
-      off(events: string, handler: Function) {
-        if (events === undefined) {
+      off(eventTypes: string, handler: Function) {
+        if (eventTypes === undefined) {
           return;
         }
 
         var handlers = this.handlers;
 
-        for (var event of splitStr(events)) {
+        for (var type of splitStr(eventTypes)) {
           if (!handler) {
-            delete handlers[event];
+            delete handlers[type];
           } else {
-            handlers[event] && handlers[event].splice(inArray(handlers[event], handler), 1);
+            handlers[type] && handlers[type].splice(inArray(handlers[type], handler), 1);
           }
         }
 
@@ -2124,18 +2117,18 @@ module Carbon {
        * emit event to the listeners
        */
       emit(eventType: string, data: any) {
-        // we also want to trigger dom events
         if (this.options.domEvents) {
           triggerDomEvent(eventType, data);
         }
 
         // no handlers, so skip it all
         var handlers = this.handlers[eventType] && this.handlers[eventType].slice();
+
         if (!handlers || !handlers.length) {
           return;
         }
 
-        data.type = event;
+        data.type = eventType;
         data.preventDefault = function () {
           data.srcEvent.preventDefault();
         };
@@ -2188,18 +2181,13 @@ module Carbon {
         manager.oldCssProps = { };
       }
     }
-    
-    /**
-     * trigger dom event
-     */
-    function triggerDomEvent(type: string, data: any) {
+
+    function triggerDomEvent(eventType: string, data: any) {
       var gestureEvent = document.createEvent('Event');
-      gestureEvent.initEvent(type, true, true);
+      gestureEvent.initEvent(eventType, true, true);
       gestureEvent.gesture = data;
       data.target.dispatchEvent(gestureEvent);
     }
-    
-
     
     var SINGLE_TOUCH_INPUT_MAP = {
       touchstart: INPUT_START,
@@ -2208,20 +2196,16 @@ module Carbon {
       touchcancel: INPUT_CANCEL
     };
     
-    var SINGLE_TOUCH_TARGET_EVENTS = 'touchstart';
-    var SINGLE_TOUCH_WINDOW_EVENTS = 'touchstart touchmove touchend touchcancel';
-    
     /**
      * Touch events input
      */
     class SingleTouchInput extends Input {
-      started: boolean;
+      started = false;
 
       constructor(manager: Manager, callback) {
         super(manager, callback);
-        this.evTarget = SINGLE_TOUCH_TARGET_EVENTS;
-        this.evWin = SINGLE_TOUCH_WINDOW_EVENTS;
-        this.started = false; 
+        this.evTarget = 'touchstart';
+        this.evWin = 'touchstart touchmove touchend touchcancel';
 
         this.init();
       }
