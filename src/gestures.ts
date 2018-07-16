@@ -1662,9 +1662,7 @@ module Carbon {
       mouseup: INPUT_END
     };
     
-    /**
-     * Mouse events input
-     */
+    /* Mouse events input */
     class MouseInput extends Input {
       pressed = false; // mousedown state
 
@@ -1677,11 +1675,9 @@ module Carbon {
         this.init();
       }
 
-      /**
-       * handle mouse events
-       */  
+      /* handle mouse events */  
       handler(ev: any) {
-        var eventType = MOUSE_INPUT_MAP[ev.type];
+        let eventType = MOUSE_INPUT_MAP[ev.type];
 
         // on start we want to have the left mouse button down
         if (eventType & INPUT_START && ev.button === 0) {
@@ -1702,8 +1698,8 @@ module Carbon {
         }
 
         this.callback(this.manager, eventType, {
-          pointers: [ev],
-          changedPointers: [ev],
+          pointers: [ ev ],
+          changedPointers: [ ev ],
           pointerType: 'mouse',
           srcEvent: ev
         });
@@ -1738,9 +1734,7 @@ module Carbon {
         this.init();
       }
 
-      /**
-       * handle mouse and touch events
-       */
+      /* handle mouse and touch events */
       handler(manager: Manager, inputEvent?: string, inputData?: any) {
         let isTouch = inputData.pointerType === 'touch';
         let isMouse = inputData.pointerType === 'mouse';
@@ -1759,14 +1753,11 @@ module Carbon {
         this.callback(manager, inputEvent, inputData);
       }
 
-      /**
-       * remove the event listeners
-       */
+      /* remove the event listeners */
       destroy() {
         this.touch.destroy();
         this.mouse.destroy();
       }
-      
     }
     
     function recordTouches(eventType, eventData) {
@@ -1839,8 +1830,6 @@ module Carbon {
       else {
         type = TouchMouseInput;
       }
-
-      console.log('INPUT', type);
 
       return new type(manager, inputHandler);
     }
@@ -1952,8 +1941,8 @@ module Carbon {
         // run the touch-action polyfill
         this.touchAction.preventDefaults(inputData);
 
-        var recognizer = void 0;
-        var recognizers = this.recognizers;
+        let recognizer = void 0;
+        let recognizers = this.recognizers;
 
         // this holds the recognizer that is being recognized.
         // so the recognizer's state needs to be BEGAN, CHANGED, ENDED or RECOGNIZED
@@ -2007,7 +1996,7 @@ module Carbon {
           return recognizer;
         }
 
-        var recognizers = this.recognizers;
+        let recognizers = this.recognizers;
 
         for (var i = 0; i < recognizers.length; i++) {
           if (recognizers[i].options.event === recognizer) {
@@ -2043,9 +2032,7 @@ module Carbon {
         return recognizer;
       }
 
-      /**
-       * remove a recognizer by name or instance
-       */
+      /* remove a recognizer by name or instance */
       remove(recognizer: Recognizer|string): Manager {
         if (invokeArrayArg(recognizer, 'remove', this)) {
           return this;
@@ -2057,7 +2044,7 @@ module Carbon {
         if (recognizer) {
           var recognizers = this.recognizers;
 
-          var index = inArray(recognizers, recognizer);
+          let index = inArray(recognizers, recognizer);
 
           if (index !== -1) {
             recognizers.splice(index, 1);
@@ -2072,20 +2059,14 @@ module Carbon {
        * bind event
        * @returns {EventEmitter} this
        */
-    
       on(eventTypes: string, handler: Function) {
-        if (eventTypes === undefined) {
-          return;
-        }
         if (handler === undefined) {
-          return;
+          throw new Error('handler is Undefined');
         }
-
-        var handlers = this.handlers;
 
         for (var type of splitStr(eventTypes)) {
-          handlers[type] = handlers[type] || [ ];
-          handlers[type].push(handler);
+          this.handlers[type] = this.handlers[type] || [ ];
+          this.handlers[type].push(handler);
         }
         
         return this;
@@ -2096,16 +2077,13 @@ module Carbon {
        * @returns {EventEmitter} this
        */
       off(eventTypes: string, handler: Function) {
-        if (eventTypes === undefined) {
-          return;
-        }
-
         var handlers = this.handlers;
 
         for (var type of splitStr(eventTypes)) {
           if (!handler) {
             delete handlers[type];
-          } else {
+          } 
+          else {
             handlers[type] && handlers[type].splice(inArray(handlers[type], handler), 1);
           }
         }
@@ -2288,11 +2266,6 @@ module Carbon {
           userSelect: 'none',
       
           /**
-           * Disable the Windows Phone grippers when pressing an element.
-           */
-          touchSelect: 'none',
-      
-          /**
            * Disables the default callout shown when you touch and hold a touch target.
            * On iOS, when you touch and hold a touch target such as a link, Safari displays
            * a callout containing information about the link. This property allows you to disable that callout.
@@ -2300,12 +2273,7 @@ module Carbon {
           touchCallout: 'none',
       
           /**
-           * Specifies whether zooming is enabled. Used by IE10>
-           */
-          contentZooming: 'none',
-      
-          /**
-           * Specifies that an entire element should be draggable instead of its contents. Mainly for desktop browsers.
+           * Specifies that an entire element should be draggable instead of its contents.
            */
           userDrag: 'none',
       
