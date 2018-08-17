@@ -16,6 +16,7 @@ module Carbon {
       [ 'auto', 'manipulation', 'pan-y', 'pan-x', 'pan-x pan-y', 'none'].forEach(function (val) {
         return touchMap[val] = CSS.supports('touch-action', val);
       });
+
       return touchMap;
     }
 
@@ -61,18 +62,15 @@ module Carbon {
       Failed = 32
     };
 
-    /**
-     * get a unique id
-     */
+
     var _uniqueId = 1;
-    
+
+     /* get a unique id */
     function uniqueId(): number {
       return _uniqueId++;
     }
     
-    /**
-     * walk objects and arrays
-     */
+    /* walk objects and arrays */
     function each(obj: any, iterator: Function, context?: any) {
       var i = void 0;
     
@@ -356,9 +354,7 @@ module Carbon {
         return this.requireFail.length > 0;
       }
     
-      /**
-       * if the recognizer can recognize simultaneous with an other recognizer
-       */
+      /* if the recognizer can recognize simultaneous with an other recognizer */
       canRecognizeWith(otherRecognizer: Recognizer): boolean {
         return !!this.simultaneous[otherRecognizer.id];
       }
@@ -456,10 +452,7 @@ module Carbon {
       */
       abstract process(inputData: any): State;
       
-      /**
-       * return the preferred touch-action
-       */
-
+      /* return the preferred touch-action */
       abstract getTouchAction(): Array<string>;
     
       /**
@@ -469,10 +462,7 @@ module Carbon {
       abstract reset();
     }
 
-    /**
-     * This recognizer is just used as a base for the simple attribute recognizers.
-     */
-    
+    /* This recognizer is just used as a base for the simple attribute recognizers. */
     class AttrRecognizer extends Recognizer {
       static defaults = {
         pointers: 1 // number
@@ -482,18 +472,14 @@ module Carbon {
         super(mergeOptions(options, AttrRecognizer.defaults));
       }
     
-      /**
-       * Used to check if it the recognizer receives valid input, like input.distance > 10.
-       */  
+      /* Used to check if it the recognizer receives valid input, like input.distance > 10 */  
       attrTest(input: any): boolean {
         var optionPointers = this.options.pointers;
         
         return optionPointers === 0 || input.pointers.length === optionPointers;
       }
     
-      /**
-       * Process the input and return the state for the recognizer
-       */
+      /* Process the input and return the state for the recognizer */
       process(input: any): State {
         var state = this.state;
         var eventType = input.eventType;
@@ -532,7 +518,6 @@ module Carbon {
 
     /* Recognized when two or more pointer are moving in a circular motion. */
     class RotateRecognizer extends AttrRecognizer {
-    
       static defaults = {
         event: 'rotate',
         threshold: 0,
@@ -543,11 +528,11 @@ module Carbon {
         super(mergeOptions(options, RotateRecognizer.defaults));
       }
     
-    getTouchAction() {
+      getTouchAction() {
         return [ 'none' ];
       }
-    
-    attrTest(input) {
+      
+      attrTest(input) {
         return super.attrTest(input)
           && (Math.abs(input.rotation) > this.options.threshold || ((this.state & State.Began)) !== 0);
       }
@@ -559,6 +544,7 @@ module Carbon {
       threshhold: number;
       pointers: number;
     }
+
     /**
      * Pinch
      * Recognized when two or more pointers are moving toward (zoom-in) or away from each other (zoom-out).
@@ -603,7 +589,6 @@ module Carbon {
       }
     }
 
-    
     interface PanOptions {
       threshold: number;
       pointers: number;
@@ -672,9 +657,8 @@ module Carbon {
       }
     
       attrTest(input) {
-        //replace with a super call?
+        // replace with a super call?
 
-        
         return super.attrTest(input) && (this.state & State.Began || !(this.state & State.Began) && this.directionTest(input));
       }
 
@@ -745,18 +729,14 @@ module Carbon {
         }
     }
     
-    /**
-     * simple function bind
-     */
+    /* simple function bind */
     function bindFn(fn: Function, context: any): Function {
       return function boundFn() {
         return fn.apply(context, arguments);
       };
     }
     
-    /**
-     * set a timeout with a given scope
-     */
+    /* set a timeout with a given scope */
     function setTimeoutContext(fn: Function, timeout: number, context: any): number{
       return setTimeout(bindFn(fn, context), timeout);
     }
@@ -1042,9 +1022,7 @@ module Carbon {
         return cleanTouchActions(actions.join(' '));
       }
     
-      /**
-       * this method is called on each input cycle and provides the preventing of the browser behavior
-       */
+      /* this method is called on each input cycle and provides the preventing of the browser behavior  */
       preventDefaults(input: any) {
         var srcEvent = input.srcEvent;
 
@@ -1083,18 +1061,14 @@ module Carbon {
         }
       }
     
-      /**
-      * call preventDefault to prevent the browser's default behavior (scrolling in most cases)
-      */
+      /* call preventDefault to prevent the browser's default behavior (scrolling in most cases) */
       preventSrc(srcEvent: Event) {
         this.manager.session.prevented = true;
         srcEvent.preventDefault();
       }
     }
     
-    /**
-     * find if a node is in the given parent
-     */
+    /* find if a node is in the given parent */
     function hasParent(node: Node, parent: Node): boolean {
       while (node) {
         if (node === parent) {
@@ -1176,9 +1150,7 @@ module Carbon {
       return Math.atan2(y, x) * 180 / Math.PI;
     }
     
-    /**
-     * get the direction between two points
-     */
+    /* get the direction between two points */
     function getDirection(x: number, y: number) : Direction {
       if (x === y) {
         return Direction.None;
@@ -1283,16 +1255,13 @@ module Carbon {
       input.direction = direction;
     }
     
-    /**
-     * extend the data with some usable properties like scale, rotate, velocity etc
-     */
+    /* extend the data with some usable properties like scale, rotate, velocity etc */
     function computeInputData(manager: Manager, input: any) {
       var session = manager.session;
       var pointers = input.pointers;
       var pointersLength = pointers.length;
     
       // store the first input to calculate the distance and direction
-    
       if (!session.firstInput) {
         session.firstInput = simpleCloneInputData(input);
       }
@@ -1339,9 +1308,7 @@ module Carbon {
       input.target = target;
     }
     
-    /**
-     * handle input events
-     */
+    /* handle input events */
     function inputHandler(manager: Manager, eventType, input: any) {
       let pointersLen = input.pointers.length;
       let changedPointersLen = input.changedPointers.length;
@@ -1371,9 +1338,7 @@ module Carbon {
       manager.session.prevInput = input;
     }
     
-    /**
-     * split string on whitespace
-     */  
+    /* split string on whitespace */  
     function splitStr(text: string): Array<string> {
       return text.trim().split(/\s+/g);
     }
@@ -1444,9 +1409,7 @@ module Carbon {
         this.evWin && addEventListeners(getWindowForElement(this.element), this.evWin, this.domHandler);
       }
     
-      /**
-       * unbind the events
-       */  
+      /* unbind the events */  
       destroy() {
         this.evEl && removeEventListeners(this.element, this.evEl, this.domHandler);
         this.evTarget && removeEventListeners(this.target, this.evTarget, this.domHandler);
@@ -1462,9 +1425,7 @@ module Carbon {
       pointerout: INPUT_CANCEL
     };
       
-    /**
-     * Pointer events input
-     */
+    /* Pointer events input */
     class PointerEventInput extends Input {
       store: Array<PointerEvent>;
 
@@ -1526,8 +1487,6 @@ module Carbon {
       }
     }
     
-
-    
     /**
      * unique array with objects based on a key (like 'id') or just by the array's value
      * @param {Array} src [{id:1},{id:2},{id:1}]
@@ -1569,13 +1528,11 @@ module Carbon {
     
     let TOUCH_TARGET_EVENTS = 'touchstart touchmove touchend touchcancel';
     
-    /**
-     * Multi-user touch events input
-     */
+    /* Multi-user touch events input */
     class TouchInput extends Input {
       targetIds: { };
 
-      constructor(manager, callback) {
+      constructor(manager: Manager, callback) {
         super(manager, callback);
       
         this.evTarget = TOUCH_TARGET_EVENTS;
@@ -1601,8 +1558,8 @@ module Carbon {
       }
     }
     
-    function getTouches(ev, type) {
-      let allTouches = Array.from(ev.touches);
+    function getTouches(ev: TouchEvent, type) {
+      let allTouches = Array.from<Touch>(ev.touches);
       let targetIds = this.targetIds;
     
       // when there is only one touch, the process can be simplified
@@ -1619,10 +1576,8 @@ module Carbon {
       let target = this.target;
     
       // get target touches from touches
-    
-      targetTouches = allTouches.filter(function(touch) {
-        return hasParent(touch.target, target);
-      });
+
+      targetTouches = allTouches.filter(touch => hasParent(touch.target, target));
     
       // collect touches
       if (type === INPUT_START) {
@@ -1812,7 +1767,6 @@ module Carbon {
      */
     function createInputInstance(manager: Manager): Input {
       var type = void 0;
-      // let inputClass = manager.options.inputClass;
       var inputClass = manager.options.inputClass;
     
       if (inputClass) {
@@ -1932,7 +1886,7 @@ module Carbon {
        * it walks through all the recognizers and tries to detect the gesture that is being made
        */
       recognize(inputData: any) {
-        var session = this.session;
+        let session = this.session;
 
         if (session.stopped) {
           return;
@@ -2091,9 +2045,7 @@ module Carbon {
         return this;
       }
     
-      /**
-       * emit event to the listeners
-       */
+      /*  emit event to the listeners */
       emit(eventType: string, data: any) {
         if (this.options.domEvents) {
           triggerDomEvent(eventType, data);
@@ -2144,7 +2096,7 @@ module Carbon {
       }
       var prop = void 0;
 
-      each(manager.options.cssProps, function (value, name) {
+      each(manager.options.cssProps, function(value, name) {
         prop = name;
         if (add) {
           manager.oldCssProps[prop] = element.style[prop];
@@ -2174,9 +2126,7 @@ module Carbon {
       touchcancel: INPUT_CANCEL
     };
     
-    /**
-     * Touch events input
-     */
+    /* Touch events input */
     class SingleTouchInput extends Input {
       started = false;
 
@@ -2260,9 +2210,7 @@ module Carbon {
        * @namespace
        */
       cssProps: {
-          /**
-           * Disables text selection to improve the dragging gesture. Mainly for desktop browsers.
-           */
+          /* Disables text selection to improve the dragging gesture. */
           userSelect: 'none',
       
           /**
@@ -2272,9 +2220,7 @@ module Carbon {
            */
           touchCallout: 'none',
       
-          /**
-           * Specifies that an entire element should be draggable instead of its contents.
-           */
+          /* Specifies that an entire element should be draggable instead of its contents. */
           userDrag: 'none',
       
           /**
