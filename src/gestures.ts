@@ -411,12 +411,11 @@ module Carbon {
           }
           i++;
         }
+        
         return true;
       }
     
-      /**
-       * update the recognizer
-       */
+      /*  update the recognizer */
       recognize(inputData: any) {
         // make a new copy of the inputData
         // so we can change the inputData without messing up the other recognizers
@@ -446,10 +445,7 @@ module Carbon {
         }
       }
     
-      /**
-      * return the state of the recognizer
-      * the actual recognizing happens in this method
-      */
+      /*  return the state of the recognizer the actual recognizing happens in this method */
       abstract process(inputData: any): State;
       
       /* return the preferred touch-action */
@@ -545,10 +541,7 @@ module Carbon {
       pointers: number;
     }
 
-    /**
-     * Pinch
-     * Recognized when two or more pointers are moving toward (zoom-in) or away from each other (zoom-out).
-     */
+    /* Pinch recognized when two or more pointers are moving toward (zoom-in) or away from each other (zoom-out). */
     class PinchRecognizer extends AttrRecognizer {  
       static defaults = {
         event: 'pinch',
@@ -869,10 +862,7 @@ module Carbon {
       }
     }
     
-    /**
-     * Press
-     * Recognized when the pointer is down for x ms without any movement.
-     */
+    /* Press Recognized when the pointer is down for x ms without any movement. */
     class PressRecognizer extends Recognizer {  
       static defaults = {
         event: 'press',
@@ -893,9 +883,9 @@ module Carbon {
       }
     
       process(input): State {
-        var validPointers = input.pointers.length === this.options.pointers;
-        var validMovement = input.distance < this.options.threshold;
-        var validTime = input.deltaTime > this.options.time;
+        let validPointers = input.pointers.length === this.options.pointers;
+        let validMovement = input.distance < this.options.threshold;
+        let validTime = input.deltaTime > this.options.time;
 
         this._input = input;
 
@@ -1819,17 +1809,12 @@ module Carbon {
 
     export class Manager {
       options: Options = { };
-
       handlers: any = { };
-      
       session: Session = { };
-
       recognizers: Array<Recognizer> = [];
       oldCssProps = {};
-
       input: any;
       element: HTMLElement;
-
       touchAction: TouchAction;
 
       constructor(element: HTMLElement, options?: Options) {
@@ -1901,12 +1886,9 @@ module Carbon {
         // this holds the recognizer that is being recognized.
         // so the recognizer's state needs to be BEGAN, CHANGED, ENDED or RECOGNIZED
         // if no recognizer is detecting a thing, it is set to `null`
-
         var curRecognizer = session.curRecognizer;
 
-        // reset when the last recognizer is recognized
-        // or when we're in a new session
-
+        // reset when the last recognizer is recognized or when we're in a new session
         if (!curRecognizer || curRecognizer && curRecognizer.state & State.Recognized) {
           curRecognizer = session.curRecognizer = null;
         }
@@ -1926,7 +1908,8 @@ module Carbon {
           recognizer.canRecognizeWith(curRecognizer))) {
             // 3
             recognizer.recognize(inputData);
-          } else {
+          } 
+          else {
             recognizer.reset();
           }
 
@@ -1939,13 +1922,8 @@ module Carbon {
         }
       }
     
-      /**
-       * get a recognizer by its event name.
-       * @param {Recognizer|String} recognizer
-       * @returns {Recognizer|Null}
-       */
-    
-      get(recognizer) {
+      /* get a recognizer by its event name. */    
+      get(recognizer: Recognizer | string) : Recognizer | null {
         if (recognizer instanceof Recognizer) {
           return recognizer;
         }
@@ -2226,8 +2204,6 @@ module Carbon {
           /**
            * Overrides the highlight color shown when the user taps a link or a JavaScript
            * clickable element in iOS. This property obeys the alpha value, if specified.
-           * @type {String}
-           * @default 'rgba(0,0,0,0)'
            */
           tapHighlightColor: 'rgba(0,0,0,0)'
         }
