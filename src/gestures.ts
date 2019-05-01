@@ -11,12 +11,12 @@ module Carbon {
         return false;
       }
       
-      var touchMap = { };
+      let touchMap = { };
 
-      [ 'auto', 'manipulation', 'pan-y', 'pan-x', 'pan-x pan-y', 'none'].forEach(function (val) {
-        return touchMap[val] = CSS.supports('touch-action', val);
-      });
-
+      for (var val of [ 'auto', 'manipulation', 'pan-y', 'pan-x', 'pan-x pan-y', 'none']) {
+        touchMap[val] = CSS.supports('touch-action', val);
+      }
+      
       return touchMap;
     }
 
@@ -289,7 +289,7 @@ module Carbon {
           return this;
         }
 
-        var simultaneous = this.simultaneous;
+        let simultaneous = this.simultaneous;
 
         otherRecognizer = getRecognizerByNameIfManager(otherRecognizer, this);
 
@@ -557,14 +557,15 @@ module Carbon {
         return [ 'none' ];
       }
       
-      attrTest(input) {
+      attrTest(input: any) {
         return super.attrTest(input) 
           && (Math.abs(input.scale - 1) > this.options.threshold || (this.state & State.Began) !== 0);
       }
     
       emit(input) {
         if (input.scale !== 1) {
-          var inOut = input.scale < 1 ? 'in' : 'out';
+          const inOut = input.scale < 1 ? 'in' : 'out';
+
           input.additionalEvent = this.options.event + inOut;
         }
 
@@ -574,11 +575,11 @@ module Carbon {
     
     function directionStr(direction: Direction): string {
       switch (direction) {
-        case Direction.Down: return 'down';
-        case Direction.Up: return 'up';
-        case Direction.Left: return 'left';
-        case Direction.Right: return 'right';
-        default: return '';
+        case Direction.Down  : return 'down';
+        case Direction.Up    : return 'up';
+        case Direction.Left  : return 'left';
+        case Direction.Right : return 'right';
+        default              : return '';
       }
     }
 
@@ -588,10 +589,7 @@ module Carbon {
       direction: Direction
     }
 
-    /**
-     * Pan
-     * Recognized when the pointer is down and moved in the allowed direction.
-     */
+    /* Pan: Recognized when the pointer is down and moved in the allowed direction. */
     class PanRecognizer extends AttrRecognizer {
       static defaults = {
         event: 'pan',
@@ -639,7 +637,8 @@ module Carbon {
             direction = x === 0 ? Direction.None : x < 0 ? Direction.Left : Direction.Right;
             hasMoved = x !== this.pX;
             distance = Math.abs(input.deltaX);
-          } else {
+          } 
+          else {
             direction = y === 0 ? Direction.None : y < 0 ? Direction.Up : Direction.Down;
             hasMoved = y !== this.pY;
             distance = Math.abs(input.deltaY);
@@ -669,10 +668,7 @@ module Carbon {
       }
     }
     
-    /**
-     * Swipe
-     * Recognized when the pointer is moving fast (velocity), with enough distance in the allowed direction.
-     */
+    /* Swipe : Recognized when the pointer is moving fast (velocity), with enough distance in the allowed direction. */
     class SwipeRecognizer extends AttrRecognizer {
       static defaults = {
         event: 'swipe',
@@ -713,7 +709,7 @@ module Carbon {
       }
 
       emit(input) {
-          var direction = directionStr(input.offsetDirection);
+          let direction = directionStr(input.offsetDirection);
           if (direction) {
             this.manager.emit(this.options.event + direction, input);
           }
@@ -805,8 +801,8 @@ module Carbon {
             return this.failTimeout();
           }
 
-          var validInterval = this.pTime ? input.timeStamp - this.pTime < this.options.interval : true;
-          var validMultiTap = !this.pCenter || getDistance(this.pCenter, input.center) < this.options.posThreshold;
+          let validInterval = this.pTime ? input.timeStamp - this.pTime < this.options.interval : true;
+          let validMultiTap = !this.pCenter || getDistance(this.pCenter, input.center) < this.options.posThreshold;
 
           this.pTime = input.timeStamp;
           this.pCenter = input.center;
@@ -822,7 +818,8 @@ module Carbon {
 
           // if tap count matches we have recognized it,
           // else it has began recognizing...
-          var tapCount = this.count % this.options.taps;
+          let tapCount = this.count % this.options.taps;
+
           if (tapCount === 0) {
             // no failing requirements, immediately trigger the tap event
             // or wait as long as the multitap interval to trigger
@@ -1231,7 +1228,8 @@ module Carbon {
         direction = getDirection(deltaX, deltaY);
     
         session.lastInterval = input;
-      } else {
+      } 
+      else {
         // use latest velocity info if it doesn't overtake a minimum period
         velocity = last.velocity;
         velocityX = last.velocityX;
@@ -1259,7 +1257,8 @@ module Carbon {
       // to compute scale and rotation we need to store the multiple touches
       if (pointersLength > 1 && !session.firstMultiple) {
         session.firstMultiple = simpleCloneInputData(input);
-      } else if (pointersLength === 1) {
+      } 
+      else if (pointersLength === 1) {
         session.firstMultiple = false;
       }
     
@@ -1337,7 +1336,7 @@ module Carbon {
      * addEventListener with multiple events at once
      * @param {EventTarget} target
      */
-    function addEventListeners(target, types: string, handler: Function) {
+    function addEventListeners(target: Element, types: string, handler: Function) {
       for (var type of splitStr(types)) {
         target.addEventListener(type, handler, false);
       }
@@ -1388,9 +1387,7 @@ module Carbon {
         };
       }
 
-      /**
-       * should handle the inputEvent data and trigger the callback
-       */  
+      /* should handle the inputEvent data and trigger the callback */  
       abstract handler(ev);
     
       init() {
@@ -1756,8 +1753,8 @@ module Carbon {
      * called by the Manager constructor
      */
     function createInputInstance(manager: Manager): Input {
-      var type = void 0;
-      var inputClass = manager.options.inputClass;
+      let type = void 0;
+      let inputClass = manager.options.inputClass;
     
       if (inputClass) {
         type = inputClass;
@@ -1778,8 +1775,8 @@ module Carbon {
       return new type(manager, inputHandler);
     }
     
-    var STOP = 1;
-    var FORCED_STOP = 2;
+    const STOP = 1;
+    const FORCED_STOP = 2;
       
     interface Point {
       x: number;
@@ -2176,44 +2173,28 @@ module Carbon {
       enable: true,
       inputTarget: null,
     
-      /**
-       * force an input class
-       * @type {Null|Function}
-       */
       inputClass: null,
-    
-      /**
-       * Some CSS properties can be used to improve the working of Hammer.
-       * Add them to this method and they will be set when creating a new Manager.
-       * @namespace
-       */
+  
       cssProps: {
           /* Disables text selection to improve the dragging gesture. */
-          userSelect: 'none',
+          // userSelect: 'none',
       
-          /**
-           * Disables the default callout shown when you touch and hold a touch target.
-           * On iOS, when you touch and hold a touch target such as a link, Safari displays
-           * a callout containing information about the link. This property allows you to disable that callout.
-           */
+          /* Disables the default callout shown when you touch and hold a touch target. */
           touchCallout: 'none',
       
           /* Specifies that an entire element should be draggable instead of its contents. */
           userDrag: 'none',
       
-          /**
-           * Overrides the highlight color shown when the user taps a link or a JavaScript
-           * clickable element in iOS. This property obeys the alpha value, if specified.
-           */
+          /* Overrides the highlight color shown on tap */
           tapHighlightColor: 'rgba(0,0,0,0)'
         }
       }
 
-      export let Pan = PanRecognizer;
-      export let Pinch = PinchRecognizer;
-      export let Press = PressRecognizer;
+      export let Pan    = PanRecognizer;
+      export let Pinch  = PinchRecognizer;
+      export let Press  = PressRecognizer;
       export let Rotate = RotateRecognizer;
-      export let Swipe = SwipeRecognizer;
-      export let Tap = TapRecognizer;
+      export let Swipe  = SwipeRecognizer;
+      export let Tap    = TapRecognizer;
   }
 }
