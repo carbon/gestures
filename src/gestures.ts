@@ -1517,14 +1517,14 @@ module Carbon {
     
     /* Multi-user touch events input */
     class TouchInput extends Input {
-      targetIds: { };
+      targetIds: any;
 
       constructor(manager: Manager, callback) {
         super(manager, callback);
       
         this.evTarget = TOUCH_TARGET_EVENTS;
         this.evTarget = TOUCH_TARGET_EVENTS;
-
+        this.targetIds = { };
         this.init();
       }
     
